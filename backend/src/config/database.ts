@@ -34,7 +34,8 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    // MONGODB_URI is guaranteed to be defined because of the check above
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
       console.log('✓ Connected to MongoDB');
       return mongoose;
     });
