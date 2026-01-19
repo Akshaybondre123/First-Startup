@@ -59,6 +59,20 @@ app.use(express.urlencoded({ extended: true }));
 connectDB().catch(console.error);
 
 // Routes
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Wampin Backend API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      restaurants: '/api/restaurants',
+      reviews: '/api/reviews'
+    }
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Backend API is running' });
 });
@@ -66,6 +80,21 @@ app.get('/api/health', (req, res) => {
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/restaurants/seed', seedRoutes);
 app.use('/api/reviews', reviewRoutes);
+
+// 404 handler for undefined routes
+app.use((req, res) => {
+  res.status(404).json({ 
+    success: false, 
+    error: 'Route not found',
+    message: `Cannot ${req.method} ${req.path}`,
+    availableEndpoints: {
+      root: '/',
+      health: '/api/health',
+      restaurants: '/api/restaurants',
+      reviews: '/api/reviews'
+    }
+  });
+});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
