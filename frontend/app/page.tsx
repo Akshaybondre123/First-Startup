@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -285,7 +285,7 @@ export default function Home() {
                transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
             >
                {[...Array(2)].map((_, i) => (
-                  <>
+                  <React.Fragment key={i}>
                      <Link href="/explore?vibe=couple" className="group relative h-64 w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0">
                         <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-80"></div>
@@ -333,7 +333,7 @@ export default function Home() {
                            <p className="text-zinc-300 text-xs font-medium">Luxury meals.</p>
                         </div>
                      </Link>
-                  </>
+                  </React.Fragment>
                ))}
             </motion.div>
          </div>
