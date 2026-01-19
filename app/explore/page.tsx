@@ -95,6 +95,14 @@ export default function ExplorePage() {
       const fetchRestaurants = async () => {
         try {
           setLoading(true);
+
+          // Map UI sort option to API-supported sort key
+          let apiSortBy: "rating" | "distance" | "name" | undefined;
+          if (filters.sortBy === "rating") apiSortBy = "rating";
+          else if (filters.sortBy === "distance") apiSortBy = "distance";
+          else if (filters.sortBy === "price") apiSortBy = "name"; // backend doesn't support price; use name
+          else if (filters.sortBy === "newest") apiSortBy = "rating"; // fallback
+
           const data = await api.restaurants.getAll({
             lat: userLocation?.lat,
             lng: userLocation?.lng,
@@ -102,7 +110,7 @@ export default function ExplorePage() {
             verified: showVerifiedOnly,
             search: searchQuery,
             maxDistance: filters.maxDistance ? filters.maxDistance * 1000 : 50000,
-            sortBy: filters.sortBy,
+            sortBy: apiSortBy,
           });
           if (data.success) {
             setRestaurants(data.data);
