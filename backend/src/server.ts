@@ -12,10 +12,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-// Allow local frontends on both :3000 and :3001 during development
+// Allow local frontends and production frontend
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   'http://localhost:3001',
+  'https://first-startup-cav7-2sxsnctmh-akshay-bondres-projects.vercel.app',
+  /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel preview deployments
 ];
 
 app.use(
@@ -24,7 +26,21 @@ app.use(
       // Allow non-browser / same-origin requests (e.g. curl, Postman, SSR)
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      // Check if origin is in allowed list
+      if (allowedOrigins.some(allowed => {
+        if (typeof allowed === 'string') {
+          return allowed === origin;
+        }
+        if (allowed instanceof RegExp) {
+          return allowed.test(origin);
+        }
+        return false;
+      })) {
+        return callback(null, true);
+      }
+
+      // In production, allow all origins (you can restrict this later)
+      if (process.env.NODE_ENV === 'production') {
         return callback(null, true);
       }
 
@@ -54,6 +70,16 @@ app.use('/api/reviews', reviewRoutes);
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
+  
+  // Handle CORS errors specifically
+  if (err.message && err.message.includes('CORS')) {
+    return res.status(403).json({ 
+      success: false, 
+      error: err.message,
+      message: 'CORS policy violation. Please check allowed origins.' 
+    });
+  }
+  
   res.status(500).json({ success: false, error: err.message || 'Internal server error' });
 });
 
