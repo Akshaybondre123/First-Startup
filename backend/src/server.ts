@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   'http://localhost:3001',
-  'https://first-startup-cav7-2sxsnctmh-akshay-bondres-projects.vercel.app',
+  'https://first-startup-pink.vercel.app',
   /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel preview deployments
 ];
 
@@ -55,8 +55,20 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-connectDB().catch(console.error);
+// Middleware to ensure DB connection before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(503).json({ 
+      success: false, 
+      error: 'Database connection failed',
+      message: 'Service temporarily unavailable. Please try again later.' 
+    });
+  }
+});
 
 // Routes
 // Root route
@@ -112,9 +124,27 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ success: false, error: err.message || 'Internal server error' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
-});
+// Start server - ensure DB connection before listening
+async function startServer() {
+  try {
+    await connectDB();
+    console.log('✓ Database connected');
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+      console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Only start server if not in Vercel serverless environment
+if (process.env.VERCEL !== '1') {
+  startServer();
+}
+
+// Export for Vercel serverless
+export default app;
 

@@ -32,7 +32,7 @@ interface Restaurant {
 
 async function getRestaurant(id: string): Promise<Restaurant | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://first-startup-cav7-2sxsnctmh-akshay-bondres-projects.vercel.app/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://first-startup-pink.vercel.app/api';
     const response = await fetch(`${apiUrl}/restaurants/${id}`, {
       cache: 'no-store',
     });

@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://first-startup-cav7-2sxsnctmh-akshay-bondres-projects.vercel.app/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://first-startup-pink.vercel.app/api';
 
 // Helper function to handle fetch errors
 const handleFetch = async (url: string, options?: RequestInit) => {
