@@ -3,16 +3,102 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Star, Share2, Phone, Clock, Navigation, ChevronLeft, CheckCircle2, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { restaurants } from "@/data/restaurants";
 import { notFound } from "next/navigation";
+import ReviewSection from "@/components/ReviewSection";
+import SocialShare from "@/components/SocialShare";
+import PhotoGallery from "@/components/PhotoGallery";
+
+interface Restaurant {
+  _id: string;
+  name: string;
+  image: string;
+  rating: number;
+  reviewCount: number;
+  priceRange: string;
+  cuisines: string[];
+  tags: string[];
+  address: string;
+  description: string;
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
+  features: string[];
+  verified: boolean;
+  phone?: string;
+  email?: string;
+  website?: string;
+}
+
+async function getRestaurant(id: string): Promise<Restaurant | null> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const response = await fetch(`${apiUrl}/restaurants/${id}`, {
+      cache: 'no-store',
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error('Error fetching restaurant:', error);
+    return null;
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<any> {
+  const { id } = await params;
+  const restaurant = await getRestaurant(id);
+  
+  if (!restaurant) {
+    return {
+      title: "Restaurant Not Found - Wampin",
+    };
+  }
+  
+  return {
+    title: `${restaurant.name} - Wampin`,
+    description: `${
+      restaurant.description ||
+      `Discover ${restaurant.name}. ${restaurant.cuisines?.join(', ')} cuisine. Rating: ${restaurant.rating}/5. ${restaurant.priceRange}.`
+    }`,
+    openGraph: {
+      title: `${restaurant.name} - Wampin`,
+      description: restaurant.description || `Check out ${restaurant.name} on Wampin`,
+      images: restaurant.image ? [restaurant.image] : [],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${restaurant.name} - Wampin`,
+      description: restaurant.description || `Check out ${restaurant.name} on Wampin`,
+      images: restaurant.image ? [restaurant.image] : [],
+    },
+  };
+}
 
 export default async function RestaurantPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const restaurant = restaurants.find(r => r.id === id);
+  const restaurant = await getRestaurant(id);
 
   if (!restaurant) {
     notFound();
   }
+
+  const [lng, lat] = restaurant.location.coordinates;
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6g4-hb1t4sg&q=${lat},${lng}&zoom=15`;
+
+  // Mock multiple images for gallery - in production, this would come from restaurant data
+  const restaurantImages = [
+    restaurant.image,
+    restaurant.image, // Replace with actual gallery images
+    restaurant.image,
+    restaurant.image,
+    restaurant.image,
+  ];
 
   return (
     <div className="min-h-screen bg-white font-sans pb-20">
@@ -39,9 +125,16 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
            <div className="container mx-auto">
               <div className="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                   <Badge className="mb-4 bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-4 py-1.5 text-sm font-medium">
-                      {restaurant.vibes[0]}
-                   </Badge>
+                   {restaurant.verified && (
+                     <Badge className="mb-4 bg-green-500/90 hover:bg-green-500 text-white border-none backdrop-blur-md px-4 py-1.5 text-sm font-medium">
+                        Verified
+                     </Badge>
+                   )}
+                   {restaurant.tags.length > 0 && (
+                     <Badge className="mb-4 bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-4 py-1.5 text-sm font-medium">
+                        {restaurant.tags[0]}
+                     </Badge>
+                   )}
                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 leading-tight">{restaurant.name}</h1>
                    <div className="flex items-center gap-4 text-lg md:text-xl font-medium text-zinc-300">
                       <span className="flex items-center gap-1.5"><MapPin className="h-5 w-5" /> {restaurant.address}</span>
@@ -66,9 +159,9 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
           <div className="flex-1">
             <div className="mb-12">
               <div className="flex flex-wrap gap-3 mb-10">
-                {restaurant.vibes.map((vibe) => (
-                  <Badge key={vibe} variant="secondary" className="text-sm px-4 py-2 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 border-zinc-100">
-                    {vibe}
+                {restaurant.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-sm px-4 py-2 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 border-zinc-100">
+                    {tag}
                   </Badge>
                 ))}
                  <Badge variant="outline" className="text-sm px-4 py-2 rounded-full border-zinc-200 text-zinc-600">
@@ -76,19 +169,55 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
                 </Badge>
               </div>
 
-              <div className="flex gap-4 mb-12 overflow-x-auto pb-2 no-scrollbar">
-                 <Button className="flex-1 md:flex-none gap-2 rounded-full h-14 px-8 text-lg font-bold bg-black text-white hover:bg-zinc-800 shadow-xl shadow-zinc-200">
-                   <Navigation className="h-5 w-5" /> Get Directions
-                 </Button>
-                 <Button variant="outline" className="gap-2 rounded-full h-14 px-8 text-lg font-medium border-zinc-200">
-                   <Share2 className="h-5 w-5" /> Share
-                 </Button>
-                 <Button variant="outline" size="icon" className="rounded-full h-14 w-14 shrink-0 border-zinc-200">
-                   <Phone className="h-5 w-5" />
-                 </Button>
+              <div className="flex flex-wrap gap-4 mb-12">
+                 <a 
+                   href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="flex-1 min-w-[140px]"
+                 >
+                   <Button className="w-full gap-2 rounded-full h-14 px-6 text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-xl">
+                     <Navigation className="h-5 w-5" /> Get Directions
+                   </Button>
+                 </a>
+                 {restaurant.phone && (
+                   <>
+                     <a href={`tel:${restaurant.phone}`} className="flex-1 min-w-[140px]">
+                       <Button className="w-full gap-2 rounded-full h-14 px-6 text-lg font-bold bg-green-600 text-white hover:bg-green-700 shadow-xl">
+                         <Phone className="h-5 w-5" /> Call Now
+                       </Button>
+                     </a>
+                     <a 
+                       href={`https://wa.me/${restaurant.phone.replace(/\D/g, '')}?text=Hi, I'm interested in ${restaurant.name}`}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="flex-1 min-w-[140px]"
+                     >
+                       <Button className="w-full gap-2 rounded-full h-14 px-6 text-lg font-bold bg-[#25D366] text-white hover:bg-[#20BA5A] shadow-xl">
+                         <Phone className="h-5 w-5" /> WhatsApp
+                       </Button>
+                     </a>
+                   </>
+                 )}
+                 <div className="flex-1 min-w-[140px]">
+                   <SocialShare 
+                     title={restaurant.name}
+                     url={`${typeof window !== 'undefined' ? window.location.origin : ''}/restaurant/${id}`}
+                     description={restaurant.description}
+                   />
+                 </div>
               </div>
 
               <div className="space-y-16">
+                {/* Photo Gallery */}
+                <section>
+                  <h2 className="text-3xl font-black tracking-tight mb-6 flex items-center gap-3">
+                    <Sparkles className="h-6 w-6 text-zinc-400" />
+                    Photo Gallery
+                  </h2>
+                  <PhotoGallery images={restaurantImages} restaurantName={restaurant.name} />
+                </section>
+
                 <section>
                   <h2 className="text-3xl font-black tracking-tight mb-6 flex items-center gap-3">
                     <Sparkles className="h-6 w-6 text-zinc-400" />
@@ -118,6 +247,8 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
                     </div>
                   </div>
                 </section>
+
+                <ReviewSection restaurantId={id} />
               </div>
             </div>
           </div>
@@ -126,13 +257,17 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
           <div className="lg:w-[400px] shrink-0 space-y-8">
             <Card className="border-zinc-100 shadow-2xl shadow-zinc-100 rounded-3xl overflow-hidden sticky top-8">
               <CardContent className="p-0">
-                {/* Map Placeholder */}
-                <div className="aspect-[4/3] w-full bg-zinc-100 relative overflow-hidden group cursor-pointer">
-                    <div className="absolute inset-0 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=21.1458,79.0882&zoom=14&size=600x600&sensor=false')] bg-cover opacity-80 grayscale group-hover:grayscale-0 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-16 w-16 bg-black text-white rounded-full flex items-center justify-center shadow-2xl relative z-10 group-hover:scale-110 transition-transform">
-                      <MapPin className="h-8 w-8" />
-                    </div>
+                {/* Google Maps Embed */}
+                <div className="aspect-[4/3] w-full bg-zinc-100 relative overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6g4-hb1t4sg&q=${lat},${lng}&zoom=15`}
+                    ></iframe>
                 </div>
 
                 <div className="p-8 space-y-8">
@@ -143,6 +278,30 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
                           <MapPin className="h-5 w-5 text-zinc-400 mt-1" />
                           <p className="text-zinc-600 leading-relaxed font-medium">{restaurant.address}</p>
                         </div>
+                        {restaurant.phone && (
+                          <div className="flex items-start gap-4">
+                            <Phone className="h-5 w-5 text-zinc-400 mt-1" />
+                            <a href={`tel:${restaurant.phone}`} className="text-zinc-600 leading-relaxed font-medium hover:text-black">
+                              {restaurant.phone}
+                            </a>
+                          </div>
+                        )}
+                        {restaurant.email && (
+                          <div className="flex items-start gap-4">
+                            <span className="h-5 w-5 text-zinc-400 mt-1">@</span>
+                            <a href={`mailto:${restaurant.email}`} className="text-zinc-600 leading-relaxed font-medium hover:text-black">
+                              {restaurant.email}
+                            </a>
+                          </div>
+                        )}
+                        {restaurant.website && (
+                          <div className="flex items-start gap-4">
+                            <span className="h-5 w-5 text-zinc-400 mt-1">🌐</span>
+                            <a href={restaurant.website} target="_blank" rel="noopener noreferrer" className="text-zinc-600 leading-relaxed font-medium hover:text-black">
+                              Visit Website
+                            </a>
+                          </div>
+                        )}
                         <div className="flex items-start gap-4">
                           <Clock className="h-5 w-5 text-zinc-400 mt-1" />
                           <div>
@@ -154,16 +313,6 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
                           </div>
                         </div>
                      </div>
-                  </div>
-                  
-                  <div className="pt-8 border-t border-zinc-100">
-                     <h3 className="font-bold text-xl mb-6">Rate Experience</h3>
-                     <div className="flex justify-between">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star key={star} className="h-8 w-8 text-zinc-200 hover:text-black hover:fill-black cursor-pointer transition-all hover:scale-110" />
-                        ))}
-                     </div>
-                     <Button className="w-full mt-8 h-12 rounded-xl text-base font-bold bg-white border border-zinc-200 text-black hover:bg-zinc-50 shadow-sm" variant="outline">Write a Review</Button>
                   </div>
                 </div>
               </CardContent>

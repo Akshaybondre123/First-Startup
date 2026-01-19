@@ -7,15 +7,26 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, MapPin, Star, Heart, Users, Music, Camera, UtensilsCrossed, Flame, ArrowRight, Sparkles, ChevronRight, ChevronLeft, Instagram, Twitter, Facebook, Mail } from "lucide-react";
 import Link from "next/link";
-import { restaurants, vibes } from "@/data/restaurants";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import RestaurantCollections from "@/components/RestaurantCollections";
+import SmartSearch from "@/components/SmartSearch";
+
+const vibes = [
+  { id: "couple", label: "Couple Friendly", icon: "Heart" },
+  { id: "family", label: "Family Friendly", icon: "Users" },
+  { id: "party", label: "Party Places", icon: "Music" },
+  { id: "aesthetic", label: "Aesthetic Cafes", icon: "Camera" },
+  { id: "dinner", label: "Best Dinner", icon: "UtensilsCrossed" },
+  { id: "special", label: "City Special", icon: "Flame" },
+];
 
 const HERO_IMAGES = [
   {
     url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2000&auto=format&fit=crop",
-    title: "The Nagpur Kitchen",
+    title: "The Signature Kitchen",
     subtitle: "Fine Dining & Cocktails"
   },
   {
@@ -30,9 +41,74 @@ const HERO_IMAGES = [
   }
 ];
 
+interface Restaurant {
+  _id: string;
+  name: string;
+  image: string;
+  rating: number;
+  reviewCount: number;
+  priceRange: string;
+  cuisines: string[];
+  tags: string[];
+  address: string;
+  description: string;
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
+  features: string[];
+  verified: boolean;
+  distance?: number;
+}
+
 export default function Home() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Get user location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        () => {
+          // User denied or error getting location
+          setUserLocation(null);
+        }
+      );
+    }
+  }, []);
+
+  // Fetch restaurants
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        setLoading(true);
+        const data = await api.restaurants.getAll({
+          lat: userLocation?.lat,
+          lng: userLocation?.lng,
+          maxDistance: 10000,
+        });
+        if (data.success) {
+          setRestaurants(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching restaurants:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, [userLocation]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -81,29 +157,34 @@ export default function Home() {
     <main className="min-h-screen bg-[#050505] text-white font-sans selection:bg-purple-500/30">
       
       {/* Floating Glass Navbar with Smart Search */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-15 py-3">
         <div className="glass-nav container mx-auto rounded-full px-6 py-3 flex items-center justify-between gap-6">
           <Link href="/" className="font-bold text-xl tracking-tight flex items-center gap-2 shrink-0">
-            <span className="text-gradient">NagpurVibes</span>
+            <img src="/wampin.png" alt="Wampin Logo" className="h-13 w-19 object-contain" />
+            <span className="text-gradient inline-block -translate-x-2 -translate-y-0">
+  Wampin
+</span>
+
           </Link>
           
           <div className="flex items-center gap-4 ml-auto">
              {/* Search Bar - Moved to Right */}
-             <div className="hidden md:flex relative group w-64 transition-all duration-300 focus-within:w-80">
-                <div className="absolute inset-0 bg-white/5 rounded-full blur-sm"></div>
-                <div className="relative flex items-center bg-[#111] rounded-full w-full border border-white/10 transition-colors focus-within:border-purple-500/50">
-                   <Search className="ml-3 h-4 w-4 text-zinc-400" />
-                   <input 
-                     type="text" 
-                     placeholder="Search places..." 
-                     className="bg-transparent border-none focus:ring-0 text-sm h-9 w-full px-3 text-white placeholder:text-zinc-500 outline-none"
-                   />
-                </div>
+             <div className="hidden md:flex relative w-64 transition-all duration-300 focus-within:w-80">
+                <SmartSearch
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  onTagSelect={(tag: string) => {
+                    window.location.href = `/explore?search=${encodeURIComponent(tag)}`;
+                  }}
+                  placeholder="Search places, tags..."
+                />
              </div>
 
-             <Button className="rounded-full bg-white text-black hover:bg-zinc-200 font-bold px-5 h-9 text-sm shrink-0">
-               Partner with Us
-             </Button>
+             <Link href="/register">
+               <Button className="rounded-full bg-white text-black hover:bg-zinc-200 font-bold px-5 h-9 text-sm shrink-0">
+                 Partner with Us
+               </Button>
+             </Link>
           </div>
         </div>
       </nav>
@@ -258,20 +339,30 @@ export default function Home() {
          </div>
       </section>
 
+      {/* Smart Collections Section */}
+      <RestaurantCollections restaurants={restaurants} userLocation={userLocation} />
+
       {/* Trending Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-10">
              <div>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-2">Trending in Nagpur <span className="text-purple-500">🔥</span></h2>
+                <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-2">Trending Near You <span className="text-purple-500">🔥</span></h2>
                 <p className="text-zinc-400">The hottest spots everyone is talking about.</p>
              </div>
              <Button variant="link" className="text-zinc-400 hover:text-white">View All</Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredRestaurants.map((restaurant, i) => (
-              <Link href={`/restaurant/${restaurant.id}`} key={restaurant.id}>
+            {loading ? (
+              <div className="col-span-4 text-center py-12 text-zinc-400">Loading restaurants...</div>
+            ) : featuredRestaurants.length === 0 ? (
+              <div className="col-span-4 text-center py-12 text-zinc-400">
+                No restaurants found. <Link href="/register" className="text-purple-400 hover:underline">Register your restaurant</Link>
+              </div>
+            ) : (
+              featuredRestaurants.map((restaurant, i) => (
+              <Link href={`/restaurant/${restaurant._id}`} key={restaurant._id}>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -297,11 +388,19 @@ export default function Home() {
                          <p className="text-sm text-zinc-400 mb-3 line-clamp-1">{restaurant.cuisines.join(", ")}</p>
                          <div className="flex items-center gap-2 text-xs text-zinc-500 mb-4">
                             <MapPin className="h-3 w-3" /> {restaurant.address}
+                            {restaurant.distance && (
+                              <span className="text-purple-400">• {restaurant.distance} km</span>
+                            )}
                          </div>
-                         <div className="flex gap-2">
-                           {restaurant.vibes.slice(0, 2).map(vibe => (
-                             <Badge key={vibe} variant="secondary" className="bg-white/10 text-white hover:bg-white/20 border-none text-[10px]">
-                               {vibe}
+                         {restaurant.verified && (
+                           <Badge className="mb-2 bg-green-500/20 text-green-400 border-green-500/50 text-[10px]">
+                             Verified
+                           </Badge>
+                         )}
+                         <div className="flex gap-2 flex-wrap">
+                           {restaurant.tags.slice(0, 2).map(tag => (
+                             <Badge key={tag} variant="secondary" className="bg-white/10 text-white hover:bg-white/20 border-none text-[10px]">
+                               {tag}
                              </Badge>
                            ))}
                          </div>
@@ -309,7 +408,7 @@ export default function Home() {
                    </div>
                 </motion.div>
               </Link>
-            ))}
+            )))}
           </div>
         </div>
       </section>
@@ -322,12 +421,14 @@ export default function Home() {
               GROW YOUR <br/> <span className="text-gradient">BUSINESS.</span>
             </h2>
             <p className="text-xl text-zinc-400 mb-12 max-w-xl mx-auto">
-              List your restaurant on NagpurVibes to reach thousands of foodies and increase your footfall.
+              List your restaurant on Wampin to reach thousands of food lovers and grow your footfall.
             </p>
             <div className="flex justify-center gap-4">
-               <Button size="lg" className="h-16 px-10 rounded-full bg-white text-black hover:bg-zinc-200 text-lg font-bold">
-                  Become a Partner
-               </Button>
+               <Link href="/register">
+                 <Button size="lg" className="h-16 px-10 rounded-full bg-white text-black hover:bg-zinc-200 text-lg font-bold">
+                    Become a Partner
+                 </Button>
+               </Link>
             </div>
         </div>
       </section>
@@ -338,10 +439,11 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                <div className="md:col-span-1">
                   <Link href="/" className="font-bold text-2xl tracking-tighter flex items-center gap-2 mb-6">
-                     <span className="text-gradient">NagpurVibes</span>
+                     <img src="/wampin.png" alt="Wampin Logo" className="h-25 w-25 object-contain" />
+                     <span className="text-gradient">Wampin</span>
                   </Link>
                   <p className="text-zinc-500 text-sm leading-relaxed mb-6">
-                     The ultimate guide to exploring Nagpur's culinary scene. Curated with love for foodies, explorers, and vibe seekers.
+                     The ultimate guide to exploring the best food and vibes around you. Curated with love for foodies, explorers, and vibe seekers.
                   </p>
                   <div className="flex gap-4">
                      <Button size="icon" variant="ghost" className="rounded-full hover:bg-white/10 hover:text-white text-zinc-400">
@@ -389,8 +491,8 @@ export default function Home() {
             </div>
             
             <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-600">
-               <p>© 2025 NagpurVibes Inc. All rights reserved.</p>
-               <p className="flex items-center gap-1">Made with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> in Nagpur</p>
+               <p>© 2025 Wampin Inc. All rights reserved.</p>
+               <p className="flex items-center gap-1">Made with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> for food lovers</p>
             </div>
          </div>
       </footer>
