@@ -74,6 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta charSet="UTF-8" />
         <link rel="icon" href="/wampin.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="/wampin.ico" type="image/x-icon" />
         <link rel="apple-touch-icon" href="/icon-192.png" />

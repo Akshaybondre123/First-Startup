@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Star, Filter, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Search, MapPin, Star, Filter, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -56,6 +56,7 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [],
     minRating: 0,
@@ -176,13 +177,124 @@ export default function ExplorePage() {
     );
   };
 
+  // Apply filters from mobile and close drawer
+  const handleApplyMobileFilters = () => {
+    // Filters are already being updated via state, just close the drawer
+    setShowMobileFilters(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans">
-       <nav className="fixed top-0 left-0 right-0 h-20 glass-nav z-50">
+      {/* Mobile Filter Overlay/Drawer */}
+      {showMobileFilters && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] md:hidden"
+            onClick={() => setShowMobileFilters(false)}
+          />
+          <div className="fixed top-0 left-0 bottom-0 w-4/5 max-w-sm bg-[#0a0a0a] z-[70] md:hidden overflow-y-auto p-6 border-r border-white/10">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5 text-purple-500" /> 
+                Filters
+              </h2>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowMobileFilters(false)}
+                className="rounded-full hover:bg-white/10"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Quick Filters for Mobile */}
+            <div className="mb-8">
+              <QuickFilters onFilterChange={setFilters} filters={filters} />
+            </div>
+            
+            <div className="space-y-8">
+              <div>
+                <label className="text-xs font-bold mb-4 block text-zinc-500 uppercase tracking-widest">Tags</label>
+                <div className="space-y-2">
+                  <div 
+                    className={cn(
+                      "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
+                      selectedTags.length === 0 ? "bg-white text-black border-white" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
+                    )}
+                    onClick={() => {
+                      setSelectedTags([]);
+                      setShowMobileFilters(false);
+                    }}
+                  >
+                    All Tags
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {AVAILABLE_TAGS.map(tag => (
+                      <div 
+                        key={tag}
+                        className={cn(
+                          "text-sm cursor-pointer px-3 py-2.5 rounded-xl transition-all font-medium border text-center", 
+                          selectedTags.includes(tag) ? "bg-purple-600 text-white border-purple-600" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
+                        )}
+                        onClick={() => {
+                          toggleTag(tag);
+                          setShowMobileFilters(false);
+                        }}
+                      >
+                        {tag}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold mb-4 block text-zinc-500 uppercase tracking-widest">Options</label>
+                <div 
+                  className={cn(
+                    "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
+                    showVerifiedOnly ? "bg-purple-600 text-white border-purple-600" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
+                  )}
+                  onClick={() => {
+                    setShowVerifiedOnly(!showVerifiedOnly);
+                    setShowMobileFilters(false);
+                  }}
+                >
+                  Verified Only
+                </div>
+              </div>
+              
+              <div className="pt-6 border-t border-white/10">
+                <Button 
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={handleApplyMobileFilters}
+                >
+                  Apply Filters
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-3 border-white/20 text-zinc-400 hover:text-white"
+                  onClick={() => {
+                    setSelectedTags([]);
+                    setShowVerifiedOnly(false);
+                    setFilters({priceRange: [], minRating: 0, maxDistance: null, sortBy: "rating"});
+                    setShowMobileFilters(false);
+                  }}
+                >
+                  Reset All
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      <nav className="fixed top-0 left-0 right-0 h-20 glass-nav z-50">
         <div className="container mx-auto px-4 h-full flex items-center gap-6">
           <Link href="/" className="font-bold text-xl tracking-tight flex items-center gap-2 hidden md:flex">
-             <img src="/wampin.png" alt="Wampin Logo" className="h-18 w-18 object-contain" />
-             <span className="text-gradient">Wampin</span>
+            <img src="/wampin.png" alt="Wampin Logo" className="h-18 w-18 object-contain" />
+            <span className="text-gradient">Wampin</span>
           </Link>
           <div className="flex-1 max-w-2xl relative">
             <SmartSearch
@@ -197,7 +309,12 @@ export default function ExplorePage() {
               placeholder="Search places, cuisines, or tags (e.g., 'family', 'couple', 'budget')..."
             />
           </div>
-          <Button variant="outline" size="icon" className="md:hidden rounded-xl border-white/10 bg-[#111] text-white">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="md:hidden rounded-xl border-white/10 bg-[#111] text-white"
+            onClick={() => setShowMobileFilters(true)}
+          >
             <Filter className="h-5 w-5" />
           </Button>
         </div>
@@ -207,71 +324,97 @@ export default function ExplorePage() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Filters Sidebar (Desktop) */}
           <aside className="w-64 hidden md:block shrink-0 space-y-8 h-[calc(100vh-120px)] sticky top-28 overflow-y-auto no-scrollbar">
-          <div>
-            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-white">
-              <SlidersHorizontal className="h-5 w-5 text-purple-500" /> Filters
-            </h3>
+            <div>
+              <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-white">
+                <SlidersHorizontal className="h-5 w-5 text-purple-500" /> Filters
+              </h3>
 
-            {/* Quick Filters */}
-            <div className="mb-8">
-              <QuickFilters onFilterChange={setFilters} filters={filters} />
-            </div>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="text-xs font-bold mb-4 block text-zinc-500 uppercase tracking-widest">Tags</label>
-                <div className="space-y-2">
+              {/* Quick Filters */}
+              <div className="mb-8">
+                <QuickFilters onFilterChange={setFilters} filters={filters} />
+              </div>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="text-xs font-bold mb-4 block text-zinc-500 uppercase tracking-widest">Tags</label>
+                  <div className="space-y-2">
+                    <div 
+                      className={cn(
+                        "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
+                        selectedTags.length === 0 ? "bg-white text-black border-white" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
+                      )}
+                      onClick={() => setSelectedTags([])}
+                    >
+                      All Tags
+                    </div>
+                    {AVAILABLE_TAGS.map(tag => (
+                      <div 
+                        key={tag}
+                        className={cn(
+                          "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
+                          selectedTags.includes(tag) ? "bg-purple-600 text-white border-purple-600" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
+                        )}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        {tag}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold mb-4 block text-zinc-500 uppercase tracking-widest">Options</label>
                   <div 
                     className={cn(
                       "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
-                      selectedTags.length === 0 ? "bg-white text-black border-white" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
+                      showVerifiedOnly ? "bg-purple-600 text-white border-purple-600" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
                     )}
-                    onClick={() => setSelectedTags([])}
+                    onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
                   >
-                    All Tags
+                    Verified Only
                   </div>
-                  {AVAILABLE_TAGS.map(tag => (
-                    <div 
-                      key={tag}
-                      className={cn(
-                        "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
-                        selectedTags.includes(tag) ? "bg-purple-600 text-white border-purple-600" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
-                      )}
-                      onClick={() => toggleTag(tag)}
-                    >
-                      {tag}
-                    </div>
-                  ))}
                 </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold mb-4 block text-zinc-500 uppercase tracking-widest">Options</label>
-                <div 
-                  className={cn(
-                    "text-sm cursor-pointer px-4 py-3 rounded-xl transition-all font-medium border", 
-                    showVerifiedOnly ? "bg-purple-600 text-white border-purple-600" : "bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20"
-                  )}
-                  onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
-                >
-                  Verified Only
+                
+                <div className="pt-6 border-t border-white/10">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-white/20 text-zinc-400 hover:text-white"
+                    onClick={() => {
+                      setSelectedTags([]);
+                      setShowVerifiedOnly(false);
+                      setFilters({priceRange: [], minRating: 0, maxDistance: null, sortBy: "rating"});
+                    }}
+                  >
+                    Reset All Filters
+                  </Button>
                 </div>
               </div>
             </div>
-          </div>
-        </aside>
+          </aside>
 
-        {/* Results */}
-        <div className="flex-1">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight mb-2">
-              {selectedTags.length > 0 ? selectedTags.join(", ") : "All Spots"}
-            </h1>
-            <p className="text-zinc-500">{filteredRestaurants.length} places found for you</p>
-            
-            {/* Mobile Tag Horizontal Scroll */}
-            <div className="md:hidden w-full overflow-x-auto pb-2 flex gap-2 mt-6 no-scrollbar">
-               <Badge 
+          {/* Results */}
+          <div className="flex-1">
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight mb-2">
+                    {selectedTags.length > 0 ? selectedTags.join(", ") : "All Spots"}
+                  </h1>
+                  <p className="text-zinc-500">{filteredRestaurants.length} places found for you</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="hidden md:flex items-center gap-2 border-white/10 bg-[#111] text-white"
+                  onClick={() => setShowMobileFilters(false)}
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                </Button>
+              </div>
+              
+              {/* Mobile Tag Horizontal Scroll */}
+              <div className="md:hidden w-full overflow-x-auto pb-2 flex gap-2 mt-6 no-scrollbar">
+                <Badge 
                   variant={selectedTags.length === 0 ? "default" : "outline"}
                   className={cn("cursor-pointer px-4 py-2 h-8 rounded-full text-sm", selectedTags.length === 0 ? "bg-white text-black hover:bg-zinc-200" : "border-white/20 text-zinc-400")}
                   onClick={() => setSelectedTags([])}
@@ -288,80 +431,92 @@ export default function ExplorePage() {
                     {tag}
                   </Badge>
                 ))}
+              </div>
             </div>
-          </div>
 
-          {loading ? (
-            <div className="text-center py-32 text-zinc-500">Loading restaurants...</div>
-          ) : filteredRestaurants.length === 0 ? (
-            <div className="text-center py-32 text-zinc-500 bg-[#111] rounded-3xl border border-dashed border-white/10">
-              <p className="text-lg font-medium">No places found matching your filters.</p>
-              <Button variant="link" onClick={() => {setSearchQuery(""); setSelectedTags([]); setShowVerifiedOnly(false); setFilters({priceRange: [], minRating: 0, maxDistance: null, sortBy: "rating"})}} className="text-purple-400 mt-2">Reset Filters</Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRestaurants.map((restaurant, i) => (
-                <Link href={`/restaurant/${restaurant._id}`} key={restaurant._id}>
-                  <motion.div 
-                     initial={{ opacity: 0, y: 20 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     transition={{ delay: i * 0.05 }}
-                     whileHover={{ y: -5 }}
-                     className="group bg-[#111] rounded-3xl overflow-hidden border border-white/5 hover:border-purple-500/30 transition-all duration-300 h-full flex flex-col shadow-lg shadow-black/50"
-                  >
-                    <div className="relative h-56 w-full overflow-hidden">
-                      <img 
-                        src={restaurant.image} 
-                        alt={restaurant.name}
-                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent"></div>
-                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-white/10">
-                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        {restaurant.rating}
-                      </div>
-                      {restaurant.verified && (
-                        <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-green-400">
-                          Verified
+            {loading ? (
+              <div className="text-center py-32 text-zinc-500">Loading restaurants...</div>
+            ) : filteredRestaurants.length === 0 ? (
+              <div className="text-center py-32 text-zinc-500 bg-[#111] rounded-3xl border border-dashed border-white/10">
+                <p className="text-lg font-medium">No places found matching your filters.</p>
+                <Button 
+                  variant="link" 
+                  onClick={() => {
+                    setSearchQuery(""); 
+                    setSelectedTags([]); 
+                    setShowVerifiedOnly(false); 
+                    setFilters({priceRange: [], minRating: 0, maxDistance: null, sortBy: "rating"});
+                    setShowMobileFilters(false);
+                  }} 
+                  className="text-purple-400 mt-2"
+                >
+                  Reset Filters
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRestaurants.map((restaurant, i) => (
+                  <Link href={`/restaurant/${restaurant._id}`} key={restaurant._id}>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ y: -5 }}
+                      className="group bg-[#111] rounded-3xl overflow-hidden border border-white/5 hover:border-purple-500/30 transition-all duration-300 h-full flex flex-col shadow-lg shadow-black/50"
+                    >
+                      <div className="relative h-56 w-full overflow-hidden">
+                        <img 
+                          src={restaurant.image} 
+                          alt={restaurant.name}
+                          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent"></div>
+                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-white/10">
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          {restaurant.rating}
                         </div>
-                      )}
-                    </div>
-                    <div className="p-5 flex-1 flex flex-col">
-                      <div className="mb-3">
-                        <div className="flex justify-between items-start mb-1">
-                          <h3 className="font-bold text-lg leading-tight text-white group-hover:text-purple-400 transition-colors">{restaurant.name}</h3>
-                          <span className="text-xs font-bold text-zinc-400 bg-white/5 px-2 py-1 rounded border border-white/5">{restaurant.priceRange}</span>
-                        </div>
-                        <p className="text-zinc-500 text-sm line-clamp-1">
-                          {restaurant.cuisines.join(", ")}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center text-xs text-zinc-500 mb-5 mt-auto">
-                        <MapPin className="h-3 w-3 mr-1 shrink-0" />
-                        <span className="truncate">{restaurant.address}</span>
-                        {restaurant.distance && (
-                          <span className="ml-2 text-purple-400">• {restaurant.distance} km</span>
+                        {restaurant.verified && (
+                          <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-green-400">
+                            Verified
+                          </div>
                         )}
                       </div>
-                      
-                      <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-                        {restaurant.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-zinc-400 border-none font-medium hover:bg-white/10 hover:text-white">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {restaurant.tags.length > 3 && (
-                           <span className="text-[10px] text-zinc-600 self-center">+{restaurant.tags.length - 3}</span>
-                        )}
+                      <div className="p-5 flex-1 flex flex-col">
+                        <div className="mb-3">
+                          <div className="flex justify-between items-start mb-1">
+                            <h3 className="font-bold text-lg leading-tight text-white group-hover:text-purple-400 transition-colors">{restaurant.name}</h3>
+                            <span className="text-xs font-bold text-zinc-400 bg-white/5 px-2 py-1 rounded border border-white/5">{restaurant.priceRange}</span>
+                          </div>
+                          <p className="text-zinc-500 text-sm line-clamp-1">
+                            {restaurant.cuisines.join(", ")}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center text-xs text-zinc-500 mb-5 mt-auto">
+                          <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                          <span className="truncate">{restaurant.address}</span>
+                          {restaurant.distance && (
+                            <span className="ml-2 text-purple-400">• {restaurant.distance} km</span>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                          {restaurant.tags.slice(0, 3).map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-zinc-400 border-none font-medium hover:bg-white/10 hover:text-white">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {restaurant.tags.length > 3 && (
+                            <span className="text-[10px] text-zinc-600 self-center">+{restaurant.tags.length - 3}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+                    </motion.div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

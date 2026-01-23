@@ -89,7 +89,6 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
   }
 
   const [lng, lat] = restaurant.location.coordinates;
-  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6g4-hb1t4sg&q=${lat},${lng}&zoom=15`;
 
   // Mock multiple images for gallery - in production, this would come from restaurant data
   const restaurantImages = [
@@ -256,21 +255,8 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
           {/* Sidebar Info */}
           <div className="lg:w-[400px] shrink-0 space-y-8">
             <Card className="border-zinc-100 shadow-2xl shadow-zinc-100 rounded-3xl overflow-hidden sticky top-8">
-              <CardContent className="p-0">
-                {/* Google Maps Embed */}
-                <div className="aspect-[4/3] w-full bg-zinc-100 relative overflow-hidden">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      allowFullScreen
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6g4-hb1t4sg&q=${lat},${lng}&zoom=15`}
-                    ></iframe>
-                </div>
-
-                <div className="p-8 space-y-8">
+              <CardContent className="p-8">
+                <div className="space-y-8">
                   <div>
                      <h3 className="font-bold text-xl mb-4">Location & Hours</h3>
                      <div className="space-y-4">
