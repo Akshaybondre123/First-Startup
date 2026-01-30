@@ -299,16 +299,24 @@ export default function Home() {
                         <Button 
                           size={isMobile ? "default" : "lg"} 
                           className="rounded-full bg-white text-black hover:bg-zinc-200 h-12 sm:h-10 md:h-12 lg:h-14 px-5 sm:px-5 md:px-6 lg:px-8 text-sm sm:text-sm md:text-base lg:text-lg font-bold shadow-lg"
+                          onClick={() => {
+                            const trendingSection = document.querySelector('[data-section="trending"]');
+                            if (trendingSection) {
+                              trendingSection.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
                         >
                           View Details
                         </Button>
-                        <Button 
-                          size={isMobile ? "default" : "lg"} 
-                          variant="outline" 
-                          className="rounded-full border-white/30 text-white hover:bg-white/10 h-12 sm:h-10 md:h-12 lg:h-14 px-5 sm:px-5 md:px-6 lg:px-8 text-sm sm:text-sm md:text-base lg:text-lg bg-white/5 backdrop-blur-sm"
-                        >
-                          Explore More
-                        </Button>
+                        <Link href="/explore">
+                          <Button 
+                            size={isMobile ? "default" : "lg"} 
+                            variant="outline" 
+                            className="rounded-full border-white/30 text-white hover:bg-white/10 h-12 sm:h-10 md:h-12 lg:h-14 px-5 sm:px-5 md:px-6 lg:px-8 text-sm sm:text-sm md:text-base lg:text-lg bg-white/5 backdrop-blur-sm w-full"
+                          >
+                            Explore More
+                          </Button>
+                        </Link>
                       </div>
                     </motion.div>
                   </div>
@@ -416,8 +424,9 @@ export default function Home() {
       <Link href="/explore?vibe=aesthetic" className="group relative h-32 w-full rounded-2xl overflow-hidden cursor-pointer border border-white/5">
         <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 z-0"></div>
         <img 
-          src="https://images.unsplash.com/photo-1507133750069-775b0e98585f?q=80&w=1200&auto=format&fit=crop" 
+          src="https://media.istockphoto.com/id/2162080709/photo/the-interior-of-a-cozy-modern-restaurant-with-chairs-a-table-flowers-coffee-nest-light.webp?a=1&b=1&s=612x612&w=0&k=20&c=SPD9jUABOnf37Hhj_sRoDSEA0imE-mY2U0TPSAyFyWo=" 
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+          alt="Cafe atmosphere"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
         <div className="relative z-10 h-full p-4 flex items-center">
@@ -463,9 +472,10 @@ export default function Home() {
             <Link href="/explore?vibe=party" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
               <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-indigo-500/20 z-0"></div>
               <img 
-                src="https://images.unsplash.com/photo-1570554520913-ce615f1f1d17?q=80&w=800&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1561221820-5ed0595bcb4c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGdyb3VwJTIwaGFuZ291dCUyMGluJTIwY2FmZXxlbnwwfHwwfHx8MA%3D%3D" 
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
                 style={{ borderRadius: '1.5rem' }}
+                alt="Group hangout in cafe"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
               <div className="relative z-10 h-full p-6 flex flex-col justify-end">
@@ -480,9 +490,10 @@ export default function Home() {
             <Link href="/explore?vibe=aesthetic" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 z-0"></div>
               <img 
-                src="https://images.unsplash.com/photo-1507133750069-775b0e98585f?q=80&w=800&auto=format&fit=crop" 
+                src="https://media.istockphoto.com/id/2162080709/photo/the-interior-of-a-cozy-modern-restaurant-with-chairs-a-table-flowers-coffee-nest-light.webp?a=1&b=1&s=612x612&w=0&k=20&c=SPD9jUABOnf37Hhj_sRoDSEA0imE-mY2U0TPSAyFyWo=" 
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
                 style={{ borderRadius: '1.5rem' }}
+                alt="Cafe atmosphere"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
               <div className="relative z-10 h-full p-6 flex flex-col justify-end">
@@ -497,9 +508,10 @@ export default function Home() {
             <Link href="/explore?vibe=dinner" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
               <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-orange-500/20 z-0"></div>
               <img 
-                src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=800&auto=format&fit=crop" 
+                src="https://plus.unsplash.com/premium_photo-1745946640151-7bd1d1f93554?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aW50ZXJpb3IlMjBkZXNpZ24lMjByZXN0dXJhbnR8ZW58MHx8MHx8fDA%3D" 
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
                 style={{ borderRadius: '1.5rem' }}
+                alt="Restaurant interior"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
               <div className="relative z-10 h-full p-6 flex flex-col justify-end">
@@ -535,7 +547,7 @@ export default function Home() {
       <RestaurantCollections restaurants={restaurants} userLocation={userLocation} />
 
       {/* Trending Section */}
-      <section className="py-10 sm:py-14 md:py-16 lg:py-20">
+      <section className="py-10 sm:py-14 md:py-16 lg:py-20" data-section="trending">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-6 sm:mb-8 md:mb-10">
             <div>

@@ -20,7 +20,7 @@ interface Restaurant {
   address: string;
   description: string;
   location: {
-    type: 'Point';
+    type: "Point";
     coordinates: [number, number];
   };
   features: string[];
@@ -28,6 +28,7 @@ interface Restaurant {
   phone?: string;
   email?: string;
   website?: string;
+  galleryImages?: string[];
 }
 
 async function getRestaurant(id: string): Promise<Restaurant | null> {
@@ -90,14 +91,11 @@ export default async function RestaurantPage({ params }: { params: Promise<{ id:
 
   const [lng, lat] = restaurant.location.coordinates;
 
-  // Mock multiple images for gallery - in production, this would come from restaurant data
-  const restaurantImages = [
-    restaurant.image,
-    restaurant.image, // Replace with actual gallery images
-    restaurant.image,
-    restaurant.image,
-    restaurant.image,
-  ];
+  // Use gallery images when available, otherwise fall back to repeating main image
+  const restaurantImages =
+    restaurant.galleryImages && restaurant.galleryImages.length > 0
+      ? [restaurant.image, ...restaurant.galleryImages].filter(Boolean)
+      : [restaurant.image, restaurant.image, restaurant.image, restaurant.image, restaurant.image];
 
   return (
     <div className="min-h-screen bg-white font-sans pb-20">
