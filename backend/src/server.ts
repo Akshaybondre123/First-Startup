@@ -22,41 +22,28 @@ const allowedOrigins = [
   /^https:\/\/.*-akshay-bondres-projects\.vercel\.app$/, // Allow your specific Vercel deployments
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow non-browser / same-origin requests (e.g. curl, Postman, SSR)
-      if (!origin) return callback(null, true);
+// Simple CORS setup for deployment
+app.use(cors({
+  origin: true, // Allow all origins for now
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200
+}));
 
-      // In production or Vercel environment, allow all origins for now
-      if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
-        return callback(null, true);
-      }
-
-      // Check if origin is in allowed list for development
-      if (allowedOrigins.some(allowed => {
-        if (typeof allowed === 'string') {
-          return allowed === origin;
-        }
-        if (allowed instanceof RegExp) {
-          return allowed.test(origin);
-        }
-        return false;
-      })) {
-        return callback(null, true);
-      }
-
-      console.log(`CORS blocked origin: ${origin}`);
-      return callback(
-        new Error(`CORS: Origin ${origin} is not allowed`),
-        false
-      );
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  })
-);
+// Additional CORS headers for Vercel
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -91,7 +78,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Backend API is running' });
+  res.json({ 
+    success: true, 
+    message: 'Backend API is running',
+    timestamp: new Date().toISOString(),
+    cors: 'enabled'
+  });
 });
 
 app.use('/api/restaurants', restaurantRoutes);

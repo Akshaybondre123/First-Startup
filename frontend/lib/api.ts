@@ -38,6 +38,9 @@ const handleFetch = async (url: string, options?: RequestInit) => {
 };
 
 export const api = {
+  health: () => {
+    return handleFetch(`${API_BASE_URL}/health`);
+  },
   restaurants: {
     getAll: (params?: {
       lat?: number;
