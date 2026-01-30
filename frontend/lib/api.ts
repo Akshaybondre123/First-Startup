@@ -1,20 +1,39 @@
 // API configuration
-// For local development this falls back to your local backend.
-// In production (Vercel), set NEXT_PUBLIC_API_URL to your deployed backend URL.
+// Using deployed backend for production
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  process.env.NEXT_PUBLIC_API_URL || "https://first-startup-py32okgu2-akshay-bondres-projects.vercel.app/api";
 
 // Helper function to handle fetch errors
 const handleFetch = async (url: string, options?: RequestInit) => {
+  console.log('Making API request to:', url);
+  
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      ...options,
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    });
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.error(`API Error: ${response.status} ${response.statusText}`);
+      if (response.status === 0 || response.status === 404) {
+        return { success: false, data: [], error: 'Backend service unavailable' };
+      }
+      return { success: false, data: [], error: `Server error: ${response.status}` };
     }
-    return await response.json();
+    
+    const data = await response.json();
+    console.log('API response:', data);
+    return data;
   } catch (error) {
-    console.error('Fetch error:', error);
-    throw error;
+    console.error('Network/CORS error:', error);
+    if (error instanceof TypeError && error.message.includes('CORS')) {
+      return { success: false, data: [], error: 'CORS error - backend configuration issue' };
+    }
+    return { success: false, data: [], error: 'Network error - please check your connection' };
   }
 };
 

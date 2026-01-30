@@ -19,6 +19,7 @@ const allowedOrigins = [
   'http://localhost:3002',
   'https://first-startup-pink.vercel.app',
   /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel preview deployments
+  /^https:\/\/.*-akshay-bondres-projects\.vercel\.app$/, // Allow your specific Vercel deployments
 ];
 
 app.use(
@@ -27,7 +28,12 @@ app.use(
       // Allow non-browser / same-origin requests (e.g. curl, Postman, SSR)
       if (!origin) return callback(null, true);
 
-      // Check if origin is in allowed list
+      // In production or Vercel environment, allow all origins for now
+      if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
+        return callback(null, true);
+      }
+
+      // Check if origin is in allowed list for development
       if (allowedOrigins.some(allowed => {
         if (typeof allowed === 'string') {
           return allowed === origin;
@@ -40,17 +46,15 @@ app.use(
         return callback(null, true);
       }
 
-      // In production, allow all origins (you can restrict this later)
-      if (process.env.NODE_ENV === 'production') {
-        return callback(null, true);
-      }
-
+      console.log(`CORS blocked origin: ${origin}`);
       return callback(
         new Error(`CORS: Origin ${origin} is not allowed`),
         false
       );
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
 app.use(express.json());
