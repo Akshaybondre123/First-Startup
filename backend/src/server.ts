@@ -34,11 +34,14 @@ app.use(cors({
 
 // Additional CORS headers for Vercel
 app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+  
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
   if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS preflight request');
     res.sendStatus(200);
   } else {
     next();
@@ -49,15 +52,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware to ensure DB connection before handling requests
 app.use(async (req, res, next) => {
+  // Skip DB check for health endpoint
+  if (req.path === '/api/health' || req.path === '/') {
+    return next();
+  }
+  
   try {
     await connectDB();
+    console.log('✓ Database connected for request:', req.path);
     next();
   } catch (error) {
-    console.error('Database connection error:', error);
-    res.status(503).json({ 
+    console.error('Database connection error for', req.path, ':', error);
+    res.status(500).json({ 
       success: false, 
       error: 'Database connection failed',
-      message: 'Service temporarily unavailable. Please try again later.' 
+      message: 'Service temporarily unavailable. Please try again later.',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
@@ -82,7 +92,20 @@ app.get('/api/health', (req, res) => {
     success: true, 
     message: 'Backend API is running',
     timestamp: new Date().toISOString(),
-    cors: 'enabled'
+    cors: 'enabled',
+    environment: process.env.NODE_ENV || 'development',
+    mongodb: process.env.MONGO_URI ? 'configured' : 'missing'
+  });
+});
+
+// Simple test endpoint without database
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Test endpoint working',
+    method: req.method,
+    path: req.path,
+    headers: req.headers
   });
 });
 
