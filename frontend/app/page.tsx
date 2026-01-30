@@ -104,22 +104,32 @@ export default function Home() {
     const fetchRestaurants = async () => {
       try {
         setLoading(true);
+        console.log('Fetching restaurants...');
+        
         const data = await api.restaurants.getAll({
           lat: userLocation?.lat,
           lng: userLocation?.lng,
           maxDistance: 10000,
         });
+        
         if (data.success) {
-          setRestaurants(data.data);
+          console.log('Successfully fetched restaurants:', data.data?.length || 0);
+          setRestaurants(data.data || []);
+        } else {
+          console.log('API returned no data:', data.error);
+          setRestaurants([]);
         }
       } catch (error) {
-        console.error('Error fetching restaurants:', error);
+        console.log('Error fetching restaurants:', error);
+        setRestaurants([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRestaurants();
+    // Add delay to allow backend to warm up
+    const timer = setTimeout(fetchRestaurants, 1000);
+    return () => clearTimeout(timer);
   }, [userLocation]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
@@ -216,7 +226,7 @@ export default function Home() {
             <img 
               src="/wampin.png" 
               alt="Wampin Logo" 
-              className="h-6 w-9 sm:h-8 sm:w-12 md:h-10 md:w-14 lg:h-13 lg:w-19 object-contain" 
+              className="h-10 w-16 sm:h-12 sm:w-18 md:h-14 md:w-21 lg:h-16 lg:w-24 object-contain" 
             />
             <span className="text-gradient hidden sm:inline-block -translate-x-2 -translate-y-0">
               Wampin
@@ -563,7 +573,13 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
             {loading ? (
-              <div className="col-span-full text-center py-8 sm:py-12 text-zinc-400">Loading restaurants...</div>
+              <div className="col-span-full text-center py-8 sm:py-12">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-zinc-400 text-sm sm:text-base">Loading restaurants...</p>
+                  <p className="text-zinc-600 text-xs">This may take a moment while our server starts up</p>
+                </div>
+              </div>
             ) : featuredRestaurants.length === 0 ? (
               <div className="col-span-full text-center py-8 sm:py-12 text-zinc-400 text-sm sm:text-base">
                 No restaurants found. <Link href="/register" className="text-purple-400 hover:underline">Register your restaurant</Link>

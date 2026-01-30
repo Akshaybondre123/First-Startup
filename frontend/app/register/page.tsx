@@ -120,45 +120,47 @@ export default function RegisterPage() {
       </div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b border-white/[0.06] transition-all duration-300 ${scrolled ? 'bg-[#030303]/95 backdrop-blur-md py-3' : 'bg-transparent py-5'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <nav className={`fixed top-0 w-full z-[60] border-b border-white/[0.06] transition-all duration-300 ${scrolled ? 'bg-[#030303]/95 backdrop-blur-md py-2 sm:py-3' : 'bg-transparent py-3 sm:py-5'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
               <img 
                 src="/wampin.png" 
                 alt="Wampin Logo" 
-                className="h-14 w-auto object-contain mt-1 group-hover:scale-105 transition-transform duration-300" 
+                className="h-10 sm:h-12 md:h-14 w-auto object-contain group-hover:scale-105 transition-transform duration-300" 
               />
-              <div className="flex flex-col -ml-2">
-                <span className="font-bold text-lg tracking-tight text-white">
+              <div className="flex flex-col -ml-1 sm:-ml-2">
+                <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white">
                   Wampin
                 </span>
-                <span className="text-[10px] text-zinc-500 tracking-widest uppercase">For Restaurants</span>
+                <span className="text-[8px] sm:text-[10px] text-zinc-500 tracking-widest uppercase">For Restaurants</span>
               </div>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+            <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-zinc-400">
               <button onClick={scrollToVibes} className="hover:text-white transition-colors">How It Works</button>
               <button onClick={scrollToVibes} className="hover:text-white transition-colors">Customer Matching</button>
               <button onClick={() => document.getElementById('benefits')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-white transition-colors">ROI</button>
               <button onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-white transition-colors">Pricing</button>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link href="/explore">
                 <Button
                   variant="ghost"
-                  className="rounded-lg text-sm h-10 px-4 text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 hidden sm:flex"
+                  className="rounded-lg text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 hidden md:flex"
                 >
-                  <Globe className="h-4 w-4 mr-2" />
-                  Customer View
+                  <Globe className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Customer View</span>
+                  <span className="sm:hidden">View</span>
                 </Button>
               </Link>
               <Button 
                 onClick={scrollToRegister}
-                className="rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm h-10 px-6 font-semibold transition-all duration-300 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40"
+                className="rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-6 font-semibold transition-all duration-300 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40"
               >
-                List Your Venue Free
+                <span className="hidden sm:inline">List Your Venue Free</span>
+                <span className="sm:hidden">List Venue</span>
               </Button>
             </div>
           </div>
@@ -166,7 +168,7 @@ export default function RegisterPage() {
       </nav>
 
       {/* IMPROVED HERO - Visual Gallery instead of Dashboard */}
-      <section ref={heroRef} className="relative min-h-screen pt-32 pb-20 flex items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative min-h-screen pt-20 sm:pt-24 md:pt-32 pb-20 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2400&q=80')] bg-cover bg-center bg-no-repeat opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#030303] via-[#030303]/80 to-[#030303]" />
