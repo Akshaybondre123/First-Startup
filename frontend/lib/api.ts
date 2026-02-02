@@ -1,17 +1,21 @@
 // API configuration
-// Using deployed backend for production
+// Using local backend for development
+// const API_BASE_URL =
+// process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+// For production deployment, use this instead:
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://first-startup-pink.vercel.app/api";
 
 // Helper function to handle fetch errors
 const handleFetch = async (url: string, options?: RequestInit) => {
   console.log('Making API request to:', url);
-  
+
   try {
     // Create AbortController for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-    
+
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
@@ -20,58 +24,58 @@ const handleFetch = async (url: string, options?: RequestInit) => {
         ...options?.headers,
       },
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     console.log('Response status:', response.status, response.statusText);
-    
+
     if (!response.ok) {
       console.error(`API Error: ${response.status} ${response.statusText}`);
-      
+
       // Try to get error details from response
       try {
         const errorData = await response.json();
         console.error('Error response data:', errorData);
-        return { 
-          success: false, 
-          data: [], 
-          error: errorData.message || errorData.error || `Server error: ${response.status}` 
+        return {
+          success: false,
+          data: [],
+          error: errorData.message || errorData.error || `Server error: ${response.status}`
         };
       } catch {
         return { success: false, data: [], error: `Server error: ${response.status} ${response.statusText}` };
       }
     }
-    
+
     const data = await response.json();
     console.log('API response success:', data);
     return data;
   } catch (error) {
     console.error('Network error details:', error);
-    
+
     // Handle timeout specifically
     if (error instanceof Error && error.name === 'AbortError') {
-      return { 
-        success: false, 
-        data: [], 
-        error: 'Request timed out. Server is taking too long to respond.' 
+      return {
+        success: false,
+        data: [],
+        error: 'Request timed out. Server is taking too long to respond.'
       };
     }
-    
+
     // More specific error handling
     if (error instanceof TypeError) {
       if (error.message.includes('Failed to fetch')) {
-        return { 
-          success: false, 
-          data: [], 
-          error: 'Server is starting up. Please wait a moment and try again.' 
+        return {
+          success: false,
+          data: [],
+          error: 'Server is starting up. Please wait a moment and try again.'
         };
       }
     }
-    
-    return { 
-      success: false, 
-      data: [], 
-      error: `Connection error: ${error instanceof Error ? error.message : 'Please try again'}` 
+
+    return {
+      success: false,
+      data: [],
+      error: `Connection error: ${error instanceof Error ? error.message : 'Please try again'}`
     };
   }
 };
@@ -80,7 +84,7 @@ const handleFetch = async (url: string, options?: RequestInit) => {
 const testConnection = async () => {
   console.log('Testing backend connection...');
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, { 
+    const response = await fetch(`${API_BASE_URL}/health`, {
       method: 'GET',
       mode: 'cors'
     });

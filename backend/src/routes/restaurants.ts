@@ -11,9 +11,9 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c;
   return Math.round(distance * 10) / 10; // Round to 1 decimal place
@@ -76,7 +76,7 @@ router.get('/', async (req: Request, res: Response) => {
     // Calculate distance if location is provided
     const restaurantsWithDistance = restaurants.map((restaurant) => {
       const restaurantData = restaurant.toObject();
-      
+
       if (lat && lng && lat !== 0 && lng !== 0) {
         const [restLng, restLat] = restaurant.location.coordinates;
         const distance = calculateDistance(lat, lng, restLat, restLng);
@@ -85,7 +85,7 @@ router.get('/', async (req: Request, res: Response) => {
           distance: distance, // in kilometers
         };
       }
-      
+
       return restaurantData;
     });
 
@@ -127,7 +127,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 // POST /api/restaurants - Create a new restaurant
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, image, priceRange, cuisines, tags, address, description, latitude, longitude, features, phone, email, website } = req.body;
+    const { name, image, galleryImages, priceRange, cuisines, tags, address, description, latitude, longitude, features, phone, email, website } = req.body;
 
     // Validate required fields
     if (!name || !address || !latitude || !longitude) {
@@ -140,6 +140,7 @@ router.post('/', async (req: Request, res: Response) => {
     const restaurant = await Restaurant.create({
       name,
       image: image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop',
+      galleryImages: galleryImages || [],
       rating: 0,
       reviewCount: 0,
       priceRange: priceRange || '₹₹',

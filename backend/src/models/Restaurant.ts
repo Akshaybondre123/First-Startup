@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IRestaurant extends Document {
   name: string;
   image: string;
+  galleryImages?: string[];
   rating: number;
   reviewCount: number;
   priceRange: string;
@@ -36,6 +37,7 @@ const RestaurantSchema = new Schema<IRestaurant>(
   {
     name: { type: String, required: true },
     image: { type: String, required: true },
+    galleryImages: [{ type: String }],
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviewCount: { type: Number, default: 0 },
     priceRange: { type: String, required: true },

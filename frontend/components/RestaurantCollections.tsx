@@ -32,7 +32,7 @@ interface Collection {
   gradient: string;
 }
 
-export default function RestaurantCollections({ restaurants, userLocation }: { restaurants: Restaurant[]; userLocation?: { lat: number; lng: number } | null }) {
+export default function RestaurantCollections({ restaurants, userLocation, loading }: { restaurants: Restaurant[]; userLocation?: { lat: number; lng: number } | null; loading?: boolean }) {
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
 
   const collections: Collection[] = [
@@ -127,11 +127,10 @@ export default function RestaurantCollections({ restaurants, userLocation }: { r
             <button
               key={collection.id}
               onClick={() => setSelectedCollection(collection.id)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all shrink-0 ${
-                selectedCollection === collection.id || (!selectedCollection && collection.id === "trending")
-                  ? `bg-gradient-to-r ${collection.gradient} text-white shadow-lg`
-                  : "bg-[#111] text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
-              }`}
+              className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all shrink-0 ${selectedCollection === collection.id || (!selectedCollection && collection.id === "trending")
+                ? `bg-gradient-to-r ${collection.gradient} text-white shadow-lg`
+                : "bg-[#111] text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+                }`}
             >
               {collection.icon}
               {collection.title.replace(/\p{Emoji}/gu, "").trim()}
@@ -140,7 +139,15 @@ export default function RestaurantCollections({ restaurants, userLocation }: { r
         </div>
 
         {/* Collection Content */}
-        {filteredRestaurants.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-zinc-400 text-sm sm:text-base">Loading restaurants...</p>
+              <p className="text-zinc-600 text-xs">Discovering the best spots for you</p>
+            </div>
+          </div>
+        ) : filteredRestaurants.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRestaurants.map((restaurant, i) => (
               <Link href={`/restaurant/${restaurant._id}`} key={restaurant._id}>

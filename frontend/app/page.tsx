@@ -76,7 +76,7 @@ export default function Home() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -105,13 +105,13 @@ export default function Home() {
       try {
         setLoading(true);
         console.log('Fetching restaurants...');
-        
+
         const data = await api.restaurants.getAll({
           lat: userLocation?.lat,
           lng: userLocation?.lng,
           maxDistance: 10000,
         });
-        
+
         if (data.success) {
           console.log('Successfully fetched restaurants:', data.data?.length || 0);
           setRestaurants(data.data || []);
@@ -223,21 +223,21 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-6 md:px-15 py-2 sm:py-3">
         <div className="glass-nav container mx-auto rounded-2xl md:rounded-full px-4 sm:px-5 md:px-6 py-2 sm:py-3 flex items-center justify-between gap-3 sm:gap-4 md:gap-6">
           <Link href="/" className="font-bold text-lg sm:text-xl tracking-tight flex items-center gap-2 shrink-0">
-            <img 
-              src="/wampin.png" 
-              alt="Wampin Logo" 
-              className="h-10 w-16 sm:h-12 sm:w-18 md:h-14 md:w-21 lg:h-16 lg:w-24 object-contain" 
+            <img
+              src="/wampin.png"
+              alt="Wampin Logo"
+              className="h-10 w-16 sm:h-12 sm:w-18 md:h-14 md:w-21 lg:h-16 lg:w-24 object-contain"
             />
             <span className="text-gradient hidden sm:inline-block -translate-x-2 -translate-y-0">
               Wampin
             </span>
           </Link>
-          
+
           {/* Mobile Search Button */}
           <div className="md:hidden flex items-center gap-2">
-            <Button 
-              size="icon" 
-              variant="ghost" 
+            <Button
+              size="icon"
+              variant="ghost"
               onClick={handleMobileSearch}
               className="rounded-full"
             >
@@ -249,7 +249,7 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-3 lg:gap-4 ml-auto">
             {/* Search Bar */}
             <div className="relative w-48 lg:w-64 xl:w-80 transition-all duration-300">
@@ -278,14 +278,14 @@ export default function Home() {
           <div className="embla__container h-full flex">
             {HERO_IMAGES.map((img, index) => (
               <div key={index} className="embla__slide relative h-full flex-[0_0_100%] min-w-0">
-                <img 
-                  src={img.url} 
+                <img
+                  src={img.url}
                   alt={img.title}
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent"></div>
-                
+
                 {/* Main Content Container */}
                 <div className="absolute inset-0 container mx-auto z-10">
                   <div className="h-full flex flex-col justify-end px-4 sm:px-6 md:px-8 lg:px-20 pb-20 sm:pb-16 md:pb-8 lg:pb-20">
@@ -303,11 +303,11 @@ export default function Home() {
                       <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-zinc-300 font-light mb-4 sm:mb-5 md:mb-6 lg:mb-8 max-w-xs sm:max-w-sm md:max-w-lg lg:max-w-xl">
                         {img.subtitle}
                       </p>
-                      
+
                       {/* Buttons with safe spacing */}
                       <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 md:gap-4">
-                        <Button 
-                          size={isMobile ? "default" : "lg"} 
+                        <Button
+                          size={isMobile ? "default" : "lg"}
                           className="rounded-full bg-white text-black hover:bg-zinc-200 h-12 sm:h-10 md:h-12 lg:h-14 px-5 sm:px-5 md:px-6 lg:px-8 text-sm sm:text-sm md:text-base lg:text-lg font-bold shadow-lg"
                           onClick={() => {
                             const trendingSection = document.querySelector('[data-section="trending"]');
@@ -319,9 +319,9 @@ export default function Home() {
                           View Details
                         </Button>
                         <Link href="/explore">
-                          <Button 
-                            size={isMobile ? "default" : "lg"} 
-                            variant="outline" 
+                          <Button
+                            size={isMobile ? "default" : "lg"}
+                            variant="outline"
                             className="rounded-full border-white/30 text-white hover:bg-white/10 h-12 sm:h-10 md:h-12 lg:h-14 px-5 sm:px-5 md:px-6 lg:px-8 text-sm sm:text-sm md:text-base lg:text-lg bg-white/5 backdrop-blur-sm w-full"
                           >
                             Explore More
@@ -335,19 +335,19 @@ export default function Home() {
             ))}
           </div>
         </div>
-        
+
         {/* Carousel Indicators - Always in right corner */}
         <div className={cn(
           "absolute flex gap-2 z-20",
           "bottom-3 right-4 sm:bottom-4 md:bottom-6 lg:bottom-8 sm:right-6 md:right-8 lg:right-8 xl:right-20"
         )}>
           {HERO_IMAGES.map((_, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={cn(
-                "h-2 rounded-full transition-all duration-300", 
+                "h-2 rounded-full transition-all duration-300",
                 i === selectedIndex ? "w-6 bg-white" : "w-2 bg-white/30"
-              )} 
+              )}
             />
           ))}
         </div>
@@ -376,185 +376,185 @@ export default function Home() {
 
       {/* Curated Collections - Improved Mobile Design */}
       {/* Curated Collections - Fixed corner issue */}
-<section className="py-10 sm:py-12 md:py-14 lg:py-16 bg-[#050505] overflow-hidden">
-  <div className="container mx-auto px-4 mb-6 sm:mb-8">
-    <div className="flex justify-between items-start mb-6 sm:mb-8">
-      <div className="max-w-xs">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <Sparkles className="h-3 w-3 text-white" />
-          </div>
-          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tighter">
-            Curated For You ✨
-          </h2>
-        </div>
-        <p className="text-zinc-400 text-xs sm:text-sm">Handpicked collections for every mood & occasion</p>
-      </div>
-      <Button variant="link" className="text-purple-400 hover:text-purple-300 text-xs sm:text-sm hidden sm:block">
-        View All
-      </Button>
-    </div>
-    
-    {/* Mobile Collections Cards */}
-    <div className="sm:hidden space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <Link href="/explore?vibe=couple" className="group relative h-40 rounded-2xl overflow-hidden cursor-pointer border border-white/5">
-          <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/20 to-rose-500/20 z-0"></div>
-          <img 
-            src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=600&auto=format&fit=crop" 
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-          <div className="relative z-10 h-full p-4 flex flex-col justify-end">
-            <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center mb-2 text-white shadow-lg">
-              <Heart className="h-4 w-4" />
-            </div>
-            <h3 className="text-base font-bold mb-1 text-white">Date Night</h3>
-            <p className="text-zinc-300 text-xs">Romantic spots for couples</p>
-          </div>
-        </Link>
-        
-        <Link href="/explore?vibe=party" className="group relative h-40 rounded-2xl overflow-hidden cursor-pointer border border-white/5">
-          <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-indigo-500/20 z-0"></div>
-          <img 
-            src="https://images.unsplash.com/photo-1570554520913-ce615f1f1d17?q=80&w=600&auto=format&fit=crop" 
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-          <div className="relative z-10 h-full p-4 flex flex-col justify-end">
-            <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center mb-2 text-white shadow-lg">
-              <Music className="h-4 w-4" />
-            </div>
-            <h3 className="text-base font-bold mb-1 text-white">Party Places</h3>
-            <p className="text-zinc-300 text-xs">Vibrant nightlife spots</p>
-          </div>
-        </Link>
-      </div>
-      
-      <Link href="/explore?vibe=aesthetic" className="group relative h-32 w-full rounded-2xl overflow-hidden cursor-pointer border border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 z-0"></div>
-        <img 
-          src="https://media.istockphoto.com/id/2162080709/photo/the-interior-of-a-cozy-modern-restaurant-with-chairs-a-table-flowers-coffee-nest-light.webp?a=1&b=1&s=612x612&w=0&k=20&c=SPD9jUABOnf37Hhj_sRoDSEA0imE-mY2U0TPSAyFyWo=" 
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-          alt="Cafe atmosphere"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-        <div className="relative z-10 h-full p-4 flex items-center">
-          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3 text-white shadow-lg">
-            <Camera className="h-5 w-5" />
-          </div>
-          <div>
-            <h3 className="text-base font-bold mb-1 text-white">Solo & Work</h3>
-            <p className="text-zinc-300 text-xs">Cafe workspace & chill</p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-zinc-400 ml-auto" />
-        </div>
-      </Link>
-    </div>
-    
-    {/* Desktop Marquee */}
-    <div className="hidden sm:block relative w-full py-4">
-      <motion.div 
-        className="flex gap-6 w-max"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ repeat: Infinity, duration: 40, ease: "linear" }}
-        style={{ willChange: 'transform' }}
-      >
-        {[...Array(2)].map((_, i) => (
-          <React.Fragment key={i}>
-            <Link href="/explore?vibe=couple" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
-              <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/20 to-rose-500/20 z-0"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" 
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-                style={{ borderRadius: '1.5rem' }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-              <div className="relative z-10 h-full p-6 flex flex-col justify-end">
-                <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-rose-500/30">
-                  <Heart className="h-5 w-5" />
+      <section className="py-10 sm:py-12 md:py-14 lg:py-16 bg-[#050505] overflow-hidden">
+        <div className="container mx-auto px-4 mb-6 sm:mb-8">
+          <div className="flex justify-between items-start mb-6 sm:mb-8">
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Sparkles className="h-3 w-3 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-1 text-white group-hover:text-rose-300 transition-colors">Date Night</h3>
-                <p className="text-zinc-300 text-sm">Romantic spots for couples</p>
+                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tighter">
+                  Curated For You ✨
+                </h2>
               </div>
-            </Link>
-            
-            <Link href="/explore?vibe=party" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
-              <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-indigo-500/20 z-0"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1561221820-5ed0595bcb4c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGdyb3VwJTIwaGFuZ291dCUyMGluJTIwY2FmZXxlbnwwfHwwfHx8MA%3D%3D" 
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-                style={{ borderRadius: '1.5rem' }}
-                alt="Group hangout in cafe"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-              <div className="relative z-10 h-full p-6 flex flex-col justify-end">
-                <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-purple-500/30">
-                  <Music className="h-5 w-5" />
-                </div>
-                <h3 className="text-xl font-bold mb-1 text-white group-hover:text-purple-300 transition-colors">Group Hangouts</h3>
-                <p className="text-zinc-300 text-sm">Squad goals & nightlife</p>
-              </div>
-            </Link>
+              <p className="text-zinc-400 text-xs sm:text-sm">Handpicked collections for every mood & occasion</p>
+            </div>
+            <Button variant="link" className="text-purple-400 hover:text-purple-300 text-xs sm:text-sm hidden sm:block">
+              View All
+            </Button>
+          </div>
 
-            <Link href="/explore?vibe=aesthetic" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
+          {/* Mobile Collections Cards */}
+          <div className="sm:hidden space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/explore?vibe=couple" className="group relative h-40 rounded-2xl overflow-hidden cursor-pointer border border-white/5">
+                <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/20 to-rose-500/20 z-0"></div>
+                <img
+                  src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=600&auto=format&fit=crop"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                <div className="relative z-10 h-full p-4 flex flex-col justify-end">
+                  <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center mb-2 text-white shadow-lg">
+                    <Heart className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-base font-bold mb-1 text-white">Date Night</h3>
+                  <p className="text-zinc-300 text-xs">Romantic spots for couples</p>
+                </div>
+              </Link>
+
+              <Link href="/explore?vibe=party" className="group relative h-40 rounded-2xl overflow-hidden cursor-pointer border border-white/5">
+                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-indigo-500/20 z-0"></div>
+                <img
+                  src="https://images.unsplash.com/photo-1570554520913-ce615f1f1d17?q=80&w=600&auto=format&fit=crop"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                <div className="relative z-10 h-full p-4 flex flex-col justify-end">
+                  <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center mb-2 text-white shadow-lg">
+                    <Music className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-base font-bold mb-1 text-white">Party Places</h3>
+                  <p className="text-zinc-300 text-xs">Vibrant nightlife spots</p>
+                </div>
+              </Link>
+            </div>
+
+            <Link href="/explore?vibe=aesthetic" className="group relative h-32 w-full rounded-2xl overflow-hidden cursor-pointer border border-white/5">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 z-0"></div>
-              <img 
-                src="https://media.istockphoto.com/id/2162080709/photo/the-interior-of-a-cozy-modern-restaurant-with-chairs-a-table-flowers-coffee-nest-light.webp?a=1&b=1&s=612x612&w=0&k=20&c=SPD9jUABOnf37Hhj_sRoDSEA0imE-mY2U0TPSAyFyWo=" 
+              <img
+                src="https://media.istockphoto.com/id/2162080709/photo/the-interior-of-a-cozy-modern-restaurant-with-chairs-a-table-flowers-coffee-nest-light.webp?a=1&b=1&s=612x612&w=0&k=20&c=SPD9jUABOnf37Hhj_sRoDSEA0imE-mY2U0TPSAyFyWo="
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-                style={{ borderRadius: '1.5rem' }}
                 alt="Cafe atmosphere"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-              <div className="relative z-10 h-full p-6 flex flex-col justify-end">
-                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-blue-500/30">
+              <div className="relative z-10 h-full p-4 flex items-center">
+                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3 text-white shadow-lg">
                   <Camera className="h-5 w-5" />
                 </div>
-                <h3 className="text-xl font-bold mb-1 text-white group-hover:text-blue-300 transition-colors">Solo & Work</h3>
-                <p className="text-zinc-300 text-sm">Cafe workspace & chill</p>
-              </div>
-            </Link>
-            
-            <Link href="/explore?vibe=dinner" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
-              <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-orange-500/20 z-0"></div>
-              <img 
-                src="https://plus.unsplash.com/premium_photo-1745946640151-7bd1d1f93554?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aW50ZXJpb3IlMjBkZXNpZ24lMjByZXN0dXJhbnR8ZW58MHx8MHx8fDA%3D" 
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
-                style={{ borderRadius: '1.5rem' }}
-                alt="Restaurant interior"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-              <div className="relative z-10 h-full p-6 flex flex-col justify-end">
-                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-amber-500/30">
-                  <UtensilsCrossed className="h-5 w-5" />
+                <div>
+                  <h3 className="text-base font-bold mb-1 text-white">Solo & Work</h3>
+                  <p className="text-zinc-300 text-xs">Cafe workspace & chill</p>
                 </div>
-                <h3 className="text-xl font-bold mb-1 text-white group-hover:text-amber-300 transition-colors">Fine Dining</h3>
-                <p className="text-zinc-300 text-sm">Luxury meals & experience</p>
+                <ChevronRight className="h-4 w-4 text-zinc-400 ml-auto" />
               </div>
             </Link>
-          </React.Fragment>
-        ))}
-      </motion.div>
-    </div>
-    
-    {/* Mobile View All Button */}
-    <div className="sm:hidden mt-6 flex justify-center">
-      <Button 
-        variant="outline" 
-        className="w-full rounded-full border-white/20 text-white hover:bg-white/10 h-10"
-        asChild
-      >
-        <Link href="/explore">
-          View All Collections
-          <ChevronRight className="h-4 w-4 ml-2" />
-        </Link>
-      </Button>
-    </div>
-  </div>
-</section>
+          </div>
+
+          {/* Desktop Marquee */}
+          <div className="hidden sm:block relative w-full py-4">
+            <motion.div
+              className="flex gap-6 w-max"
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ repeat: Infinity, duration: 40, ease: "linear" }}
+              style={{ willChange: 'transform' }}
+            >
+              {[...Array(2)].map((_, i) => (
+                <React.Fragment key={i}>
+                  <Link href="/explore?vibe=couple" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/20 to-rose-500/20 z-0"></div>
+                    <img
+                      src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+                      style={{ borderRadius: '1.5rem' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                    <div className="relative z-10 h-full p-6 flex flex-col justify-end">
+                      <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-rose-500/30">
+                        <Heart className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-1 text-white group-hover:text-rose-300 transition-colors">Date Night</h3>
+                      <p className="text-zinc-300 text-sm">Romantic spots for couples</p>
+                    </div>
+                  </Link>
+
+                  <Link href="/explore?vibe=party" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-indigo-500/20 z-0"></div>
+                    <img
+                      src="https://images.unsplash.com/photo-1561221820-5ed0595bcb4c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGdyb3VwJTIwaGFuZ291dCUyMGluJTIwY2FmZXxlbnwwfHwwfHx8MA%3D%3D"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+                      style={{ borderRadius: '1.5rem' }}
+                      alt="Group hangout in cafe"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                    <div className="relative z-10 h-full p-6 flex flex-col justify-end">
+                      <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-purple-500/30">
+                        <Music className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-1 text-white group-hover:text-purple-300 transition-colors">Group Hangouts</h3>
+                      <p className="text-zinc-300 text-sm">Squad goals & nightlife</p>
+                    </div>
+                  </Link>
+
+                  <Link href="/explore?vibe=aesthetic" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 z-0"></div>
+                    <img
+                      src="https://media.istockphoto.com/id/2162080709/photo/the-interior-of-a-cozy-modern-restaurant-with-chairs-a-table-flowers-coffee-nest-light.webp?a=1&b=1&s=612x612&w=0&k=20&c=SPD9jUABOnf37Hhj_sRoDSEA0imE-mY2U0TPSAyFyWo="
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+                      style={{ borderRadius: '1.5rem' }}
+                      alt="Cafe atmosphere"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                    <div className="relative z-10 h-full p-6 flex flex-col justify-end">
+                      <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-blue-500/30">
+                        <Camera className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-1 text-white group-hover:text-blue-300 transition-colors">Solo & Work</h3>
+                      <p className="text-zinc-300 text-sm">Cafe workspace & chill</p>
+                    </div>
+                  </Link>
+
+                  <Link href="/explore?vibe=dinner" className="group relative h-56 md:h-64 w-72 md:w-80 rounded-3xl overflow-hidden cursor-pointer border border-white/5 shrink-0 hover:border-white/20 transition-all duration-300 shadow-xl shadow-black/30">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-orange-500/20 z-0"></div>
+                    <img
+                      src="https://plus.unsplash.com/premium_photo-1745946640151-7bd1d1f93554?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aW50ZXJpb3IlMjBkZXNpZ24lMjByZXN0dXJhbnR8ZW58MHx8MHx8fDA%3D"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-overlay opacity-70"
+                      style={{ borderRadius: '1.5rem' }}
+                      alt="Restaurant interior"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                    <div className="relative z-10 h-full p-6 flex flex-col justify-end">
+                      <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center mb-3 text-white shadow-lg shadow-amber-500/30">
+                        <UtensilsCrossed className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-1 text-white group-hover:text-amber-300 transition-colors">Fine Dining</h3>
+                      <p className="text-zinc-300 text-sm">Luxury meals & experience</p>
+                    </div>
+                  </Link>
+                </React.Fragment>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Mobile View All Button */}
+          <div className="sm:hidden mt-6 flex justify-center">
+            <Button
+              variant="outline"
+              className="w-full rounded-full border-white/20 text-white hover:bg-white/10 h-10"
+              asChild
+            >
+              <Link href="/explore">
+                View All Collections
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* Smart Collections Section */}
-      <RestaurantCollections restaurants={restaurants} userLocation={userLocation} />
+      <RestaurantCollections restaurants={restaurants} userLocation={userLocation} loading={loading} />
 
       {/* Trending Section */}
       <section className="py-10 sm:py-14 md:py-16 lg:py-20" data-section="trending">
@@ -595,14 +595,14 @@ export default function Home() {
                     className="group relative bg-[#111] rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden border border-white/5"
                   >
                     <div className="aspect-[4/5] w-full overflow-hidden relative">
-                      <img 
-                        src={restaurant.image} 
+                      <img
+                        src={restaurant.image}
                         alt={restaurant.name}
                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90"></div>
-                      
+
                       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-black/50 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 border border-white/10">
                         <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-yellow-400 text-yellow-400" />
                         {restaurant.rating}
@@ -612,7 +612,7 @@ export default function Home() {
                         <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1 leading-tight">{restaurant.name}</h3>
                         <p className="text-xs sm:text-sm text-zinc-400 mb-2 sm:mb-3 line-clamp-1">{restaurant.cuisines.join(", ")}</p>
                         <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-zinc-500 mb-3 sm:mb-4">
-                          <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> 
+                          <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                           <span className="truncate">{restaurant.address.split(',')[0]}</span>
                           {restaurant.distance && (
                             <span className="text-purple-400 whitespace-nowrap">• {restaurant.distance} km</span>
@@ -637,7 +637,7 @@ export default function Home() {
               ))
             )}
           </div>
-          
+
           {/* Mobile View All Button */}
           <div className="sm:hidden mt-6 flex justify-center">
             <Button variant="outline" className="w-full rounded-full border-white/20 text-white hover:bg-white/10 h-10">
@@ -652,7 +652,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-black -z-10"></div>
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-black tracking-tighter mb-4 sm:mb-6 md:mb-8">
-            GROW YOUR <br/> <span className="text-gradient">BUSINESS.</span>
+            GROW YOUR <br /> <span className="text-gradient">BUSINESS.</span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-400 mb-6 sm:mb-8 md:mb-10 lg:mb-12 max-w-xs sm:max-w-sm md:max-w-lg mx-auto">
             List your restaurant on Wampin to reach thousands of food lovers and grow your footfall.
@@ -673,10 +673,10 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 md:gap-12 mb-10 sm:mb-12 md:mb-16">
             <div className="sm:col-span-2 lg:col-span-1">
               <Link href="/" className="font-bold text-xl sm:text-2xl tracking-tighter flex items-center gap-2 mb-4 sm:mb-6">
-                <img 
-                  src="/wampin.png" 
-                  alt="Wampin Logo" 
-                  className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-25 lg:w-25 object-contain" 
+                <img
+                  src="/wampin.png"
+                  alt="Wampin Logo"
+                  className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-25 lg:w-25 object-contain"
                 />
                 <span className="text-gradient">Wampin</span>
               </Link>
@@ -684,9 +684,9 @@ export default function Home() {
                 The ultimate guide to exploring the best food and vibes around you.
               </p>
               <div className="flex gap-3 sm:gap-4">
-                <a 
-                  href="https://www.instagram.com/_wampin_?igsh=ZDJmMTc4Y2xjeHpy" 
-                  target="_blank" 
+                <a
+                  href="https://www.instagram.com/_wampin_?igsh=ZDJmMTc4Y2xjeHpy"
+                  target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow us on Instagram"
                 >
@@ -702,7 +702,7 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-white mb-3 sm:mb-4 md:mb-6 text-sm sm:text-base">Discover</h4>
               <ul className="space-y-2 sm:space-y-3 md:space-y-4 text-xs sm:text-sm text-zinc-500">
@@ -727,9 +727,9 @@ export default function Home() {
               <h4 className="font-bold text-white mb-3 sm:mb-4 md:mb-6 text-sm sm:text-base">Stay Updated</h4>
               <p className="text-zinc-500 text-xs sm:text-sm mb-3 sm:mb-4">Get the latest vibe checks directly to your inbox.</p>
               <div className="flex gap-2">
-                <Input 
-                  placeholder="Email address" 
-                  className="bg-white/5 border-white/10 focus-visible:ring-purple-500 text-white text-xs sm:text-sm h-9 sm:h-10" 
+                <Input
+                  placeholder="Email address"
+                  className="bg-white/5 border-white/10 focus-visible:ring-purple-500 text-white text-xs sm:text-sm h-9 sm:h-10"
                 />
                 <Button size="icon" className="bg-white text-black hover:bg-zinc-200 shrink-0 h-9 w-9 sm:h-10 sm:w-10">
                   <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -737,7 +737,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
+
           <div className="pt-6 sm:pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-xs text-zinc-600">
             <p className="text-center sm:text-left">© 2025 Wampin Inc. All rights reserved.</p>
             <p className="flex items-center gap-1">
