@@ -139,7 +139,7 @@ export default function RestaurantCollections({ restaurants, userLocation, loadi
         </div>
 
         {/* Collection Content */}
-        {loading ? (
+        {loading && restaurants.length === 0 ? (
           <div className="text-center py-12">
             <div className="flex flex-col items-center gap-4">
               <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>

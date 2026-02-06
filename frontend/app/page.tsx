@@ -10,7 +10,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchRestaurants, setUserLocation } from "@/store/slices/restaurantSlice";
 import RestaurantCollections from "@/components/RestaurantCollections";
 import SmartSearch from "@/components/SmartSearch";
 
@@ -62,11 +63,15 @@ interface Restaurant {
 }
 
 export default function Home() {
+  const dispatch = useAppDispatch();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Get data from Redux store with optional chaining for safety during rehydration
+  const restaurants = useAppSelector((state) => state.restaurants?.restaurants || []);
+  const loading = useAppSelector((state) => state.restaurants?.loading || false);
+  const userLocation = useAppSelector((state) => state.restaurants?.userLocation || null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -82,55 +87,34 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Get user location
+  // Get user location and update Redux
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
+          dispatch(setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          });
+          }));
         },
         () => {
-          setUserLocation(null);
+          dispatch(setUserLocation(null));
         }
       );
     }
-  }, []);
+  }, [dispatch]);
 
-  // Fetch restaurants
+  // Fetch restaurants with caching using RTK
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        setLoading(true);
-        console.log('Fetching restaurants...');
-
-        const data = await api.restaurants.getAll({
-          lat: userLocation?.lat,
-          lng: userLocation?.lng,
-          maxDistance: 10000,
-        });
-
-        if (data.success) {
-          console.log('Successfully fetched restaurants:', data.data?.length || 0);
-          setRestaurants(data.data || []);
-        } else {
-          console.log('API returned no data:', data.error);
-          setRestaurants([]);
-        }
-      } catch (error) {
-        console.log('Error fetching restaurants:', error);
-        setRestaurants([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Add delay to allow backend to warm up
-    const timer = setTimeout(fetchRestaurants, 1000);
-    return () => clearTimeout(timer);
-  }, [userLocation]);
+    // Only fetch if we have location or after a small delay
+    // RTK thunk fetchRestaurants handles caching (5 mins) by default
+    dispatch(fetchRestaurants({
+      lat: userLocation?.lat,
+      lng: userLocation?.lng,
+      maxDistance: 10000,
+      forceRefresh: false
+    }));
+  }, [dispatch, userLocation]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -572,7 +556,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-            {loading ? (
+            {loading && restaurants.length === 0 ? (
               <div className="col-span-full text-center py-8 sm:py-12">
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -580,7 +564,7 @@ export default function Home() {
                   <p className="text-zinc-600 text-xs">This may take a moment while our server starts up</p>
                 </div>
               </div>
-            ) : featuredRestaurants.length === 0 ? (
+            ) : restaurants.length === 0 && !loading ? (
               <div className="col-span-full text-center py-8 sm:py-12 text-zinc-400 text-sm sm:text-base">
                 No restaurants found. <Link href="/register" className="text-purple-400 hover:underline">Register your restaurant</Link>
               </div>
