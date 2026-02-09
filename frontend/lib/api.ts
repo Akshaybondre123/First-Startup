@@ -1,11 +1,11 @@
 // API configuration
 // Using local backend for development
-// const API_BASE_URL =
-// process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 // For production deployment, use this instead:
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://first-startup-pink.vercel.app/api";
+// const API_BASE_URL =
+//   process.env.NEXT_PUBLIC_API_URL || "https://first-startup-pink.vercel.app/api";
 
 // Helper function to handle fetch errors
 const handleFetch = async (url: string, options?: RequestInit) => {

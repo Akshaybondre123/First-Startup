@@ -58,6 +58,10 @@ export default function RestaurantForm() {
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  // Size limits to avoid 413 errors from the server (payload too large)
+  const MAX_MAIN_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+  const MAX_GALLERY_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB per gallery image
+
   // Get user location
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -226,6 +230,11 @@ export default function RestaurantForm() {
   const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > MAX_MAIN_IMAGE_SIZE) {
+        setError("Main image is too large. Please upload an image under 2MB.");
+        return;
+      }
+      setError("");
       setFormData((prev) => ({ ...prev, image: file }));
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -238,6 +247,11 @@ export default function RestaurantForm() {
   const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > MAX_GALLERY_IMAGE_SIZE) {
+        setError("Gallery images are too large. Please upload images under 2MB each.");
+        return;
+      }
+      setError("");
       const newGalleryImages = [...formData.galleryImages];
       newGalleryImages[index] = file;
       setFormData((prev) => ({ ...prev, galleryImages: newGalleryImages }));

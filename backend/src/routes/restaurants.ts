@@ -153,7 +153,8 @@ router.post('/', async (req: Request, res: Response) => {
         coordinates: [longitude, latitude], // MongoDB uses [lng, lat]
       },
       features: features || [],
-      verified: false,
+      // Automatically verify newly registered venues on Wampin
+      verified: true,
       phone,
       email,
       website,
@@ -162,6 +163,22 @@ router.post('/', async (req: Request, res: Response) => {
     res.status(201).json({ success: true, data: restaurant });
   } catch (error: any) {
     console.error('Error creating restaurant:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/restaurants/verify-all - One-time helper to mark all venues as verified
+router.post('/verify-all', async (req: Request, res: Response) => {
+  try {
+    const result = await Restaurant.updateMany({}, { $set: { verified: true } });
+
+    res.json({
+      success: true,
+      message: 'All restaurants marked as verified',
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error: any) {
+    console.error('Error verifying all restaurants:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

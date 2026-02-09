@@ -37,12 +37,20 @@ export default function RestaurantCollections({ restaurants, userLocation, loadi
 
   const collections: Collection[] = [
     {
+      id: "all",
+      title: "All Venues",
+      description: "Every restaurant and café currently live on Wampin",
+      icon: <TrendingUp className="h-5 w-5" />,
+      filter: (restaurants) => restaurants.slice(0, 12),
+      gradient: "from-purple-500 to-blue-500",
+    },
+    {
       id: "trending",
       title: "🔥 Trending Now",
       description: "Most popular places this week",
       icon: <TrendingUp className="h-5 w-5" />,
       filter: (restaurants) => restaurants
-        .filter(r => r.reviewCount > 10)
+        .filter(r => r.reviewCount > 0)
         .sort((a, b) => (b.reviewCount * b.rating) - (a.reviewCount * a.rating))
         .slice(0, 6),
       gradient: "from-orange-500 to-red-500",
@@ -64,7 +72,7 @@ export default function RestaurantCollections({ restaurants, userLocation, loadi
       description: "Great food at affordable prices",
       icon: <DollarSign className="h-5 w-5" />,
       filter: (restaurants) => restaurants
-        .filter(r => r.priceRange === "₹" || r.priceRange === "₹₹")
+        .filter(r => r.priceRange === "₹" || r.priceRange === "₹₹" || r.priceRange === "200-400" || r.priceRange === "400-800")
         .sort((a, b) => (b.rating * b.reviewCount) - (a.rating * a.reviewCount))
         .slice(0, 6),
       gradient: "from-green-500 to-emerald-500",
